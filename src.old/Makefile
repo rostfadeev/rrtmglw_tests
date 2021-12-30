@@ -56,7 +56,8 @@ LIBS = /RHM-Lustre3.2/users/wg-slmod/mtolstykh/LLC/LIBS/xrd18xlarge.a -L${MKL_HO
 
 
 
-OBJ = \
+OBJ_old = \
+      stuff.o \
       slavmods.o \
       parkind.o \
       parrrtm.o \
@@ -72,19 +73,43 @@ OBJ = \
       rrtmglwmain.o \
       head.o \
 
+OBJ_new = \
+      stuff.o \
+      slavmods.o \
+      parkind.o \
+      parrrtm.o \
+      mod_rrtmglw.o \
+      rrlwkgall.o \
+      rrtmg_lw_setcoef.o \
+      rrtmg_lw_init.o \
+      rrtmg_lw_taumol.o \
+      rrtmg_lw_k_g.o \
+      rrtmg_lw_cldprop.o \
+      rrtmg_lw_cldprmc.o \
+      rrtmg_lw_rtrnmr.o \
+      rrtmg_lw_rad.nomcica.o \
+      head_new.o \
+
+      
 .SUFFIXES:
 .SUFFIXES: .o .c .f .f90
-OBJs=$(patsubst %.o, $(OBJ_DIR)/%.o, $(OBJ))
+OBJs_new=$(patsubst %.o, $(OBJ_DIR)/%.o, $(OBJ_new))
+OBJs_old=$(patsubst %.o, $(OBJ_DIR)/%.o, $(OBJ_old))
 
 
-all:	exec
+all:	new
 
 
-exec: $(OBJs)
-	$(F77) $(LDFLAGS) -o $(EXEC) $(FFLAGS) $(ALLINC) $(OBJs) $(LIBS)
+new: $(OBJs_new)
+	$(F77) $(LDFLAGS) -o $(EXEC) $(FFLAGS) $(ALLINC) $(OBJs_new) $(LIBS)
 	@if [[ -f ${EXEC} && -d ${RUN_DIR} ]]; then echo "cp ${EXEC} ${RUN_DIR}"; cp ${EXEC} ${RUN_DIR}; else echo "not found"; fi;
 
-$(OBJs): | inc_dir obj_dir
+old: $(OBJs_old)
+	$(F77) $(LDFLAGS) -o $(EXEC) $(FFLAGS) $(ALLINC) $(OBJs_old) $(LIBS)
+	@if [[ -f ${EXEC} && -d ${RUN_DIR} ]]; then echo "cp ${EXEC} ${RUN_DIR}"; cp ${EXEC} ${RUN_DIR}; else echo "not found"; fi;
+
+$(OBJs_new): | inc_dir obj_dir
+$(OBJs_old): | inc_dir obj_dir
 
 inc_dir:
 	@[ -d $(OBJ_DIR) ] || (mkdir $(OBJ_DIR) && echo "Created obj dir "$(OBJ_DIR)) || (echo "cannot create obj dir:" $(OBJ_DIR) ; exit 1)
@@ -96,7 +121,7 @@ lib:
 	ar cr libslm.a $(OBJs)
 
 clean:
-	rm *.o *.mod *.lst  *.L $(EXEC) $(INC_DIR)/*.mod $(INC_DIR)/*_genmod.f90 $(OBJs) $(OBJ_DIR)/*.mod
+	rm *.o *.mod *.lst  *.L $(EXEC) $(INC_DIR)/*.mod $(INC_DIR)/*_genmod.f90 $(OBJs_new) ${OBJs_old} $(OBJ_DIR)/*.mod
 
 
 

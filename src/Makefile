@@ -23,8 +23,7 @@ NETCDF_DIR=
 #MPI_HOME=/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/lib
 
 
-#CHECK=-CB -CU -CA -init=snan -init=arrays -ftrapuv 
-CHECK=-CB -CU -CA -ftrapuv 
+CHECK=-CB -CU -CA -init=snan -init=arrays -ftrapuv -check all
 #CHECK=
 
 ADDFL = -I $(NETCDF_DIR)/include $(CHECK) -fpe0 -mp1 -qopenmp -ftz -fpp  -static-intel -warn interfaces -module $(INC_DIR)
@@ -46,33 +45,59 @@ FFLAGS2 = -O3 -DMPI -DRHMC -DIA64 -r8 -no-fma -fp-model strict -traceback ${ADDF
 LDFLAGS  = -qopenmp ${OPTFL} ${ADDFL}
 
 # Name of MPI compiler driver
-F77 = ifort
+F77 = ftn
 # where to find BLAS subprogram DGEMM and MPI subprograms:
 #LIBS = -L $(PARIO_DIR) -lpario -L${MKL_HOME}/lib/intel64 -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -L${NETCDF_DIR}/lib  -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz -lm  
 #LIBIO_DIR=/RHM-Lustre3.2/users/wg-slmod/mtolstykh/LLC/LIBS
 
 # LIBS = xrd18xlarge.a -L$(MPI_HOME)  -Wl,--start-group -lmkl_sequential -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group  -L${NETCDF_DIR}/lib  -Wl,--start-group -lnetcdff -lnetcdf -lpnetcdf -lhdf5_hl  -lhdf5 -lz -ldl -lsz -lz -lcurl -Wl,--end-group 
 #LIBS = /RHM-Lustre3.2/users/wg-slmod/mtolstykh/LLC/LIBS/xrd18xlarge.a -L${MKL_HOME}/lib/intel64 -Wl,--start-group -lmkl_sequential -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group  -L${NETCDF_DIR}/lib  -Wl,--start-group -lnetcdff -lnetcdf -lpnetcdf -lhdf5_hl  -lhdf5 -lsz -ldl -lz -lcurl -Wl,--end-group 
-#LIBS = /RHM-Lustre3.2/users/wg-slmod/mtolstykh/LLC/LIBS/xrd18xlarge.a -L${MKL_HOME}/lib/intel64 -Wl,--start-group -lmkl_sequential -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group 
-LIBS=
+LIBS = /RHM-Lustre3.2/users/wg-slmod/mtolstykh/LLC/LIBS/xrd18xlarge.a -L${MKL_HOME}/lib/intel64 -Wl,--start-group -lmkl_sequential -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group 
 
 
 
 OBJ = \
+      stuff.o \
       slavmods.o \
       parkind.o \
       parrrtm.o \
-      mod_rrtmglw.o \
-      rrlwkgall.o \
+      rrlw_kg01.o \
+      rrlw_kg02.o \
+      rrlw_kg03.o \
+      rrlw_kg04.o \
+      rrlw_kg05.o \
+      rrlw_kg06.o \
+      rrlw_kg07.o \
+      rrlw_kg08.o \
+      rrlw_kg09.o \
+      rrlw_kg10.o \
+      rrlw_kg11.o \
+      rrlw_kg12.o \
+      rrlw_kg13.o \
+      rrlw_kg14.o \
+      rrlw_kg15.o \
+      rrlw_kg16.o \
+      rrlw_ref.o \
+      rrlw_ncpar.o \
+      rrlw_wvn.o \
+      rrlw_vsn.o \
+      rrlw_tbl.o \
+      rrlw_con.o \
+      rrlw_cld.o \
       rrtmg_lw_setcoef.o \
       rrtmg_lw_init.o \
       rrtmg_lw_taumol.o \
       rrtmg_lw_k_g.o \
       rrtmg_lw_cldprop.o \
       rrtmg_lw_cldprmc.o \
+      rrtmg_lw_rtrn.o \
       rrtmg_lw_rtrnmr.o \
-      rrtmglwmain.o \
+      rrtmg_lw_rtrnmc.o \
+      rrtmg_lw_rad.nomcica.o \
       head.o \
+
+OBJ2 = \
+      head2.o \
 
 .SUFFIXES:
 .SUFFIXES: .o .c .f .f90

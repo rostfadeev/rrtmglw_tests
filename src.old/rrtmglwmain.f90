@@ -64,6 +64,8 @@
       use rrtmg_lw_setcoef, only: setcoef
       use rrtmg_lw_taumol, only: taumol
 
+      use Stuff
+      
       implicit none
 
 ! public interfaces/functions/subroutines
@@ -422,7 +424,7 @@
                                               ! with respect to surface temperature
       real(kind=rb) :: dtotuclfl_dt(0:nlay+1) ! change in clear sky upward longwave flux (w/m2/k)
                                               ! with respect to surface temperature
-
+                                              
 !
 ! Initializations
 
@@ -464,7 +466,7 @@
 
 !  Prepare atmospheric profile from GCM for use in RRTMG, and define
 !  other input parameters.  
-
+          
          call inatm (KST,KEND,iplon, nlay, icld, iaer, &
               play, plev, tlay, tlev, tsfc, h2ovmr, &
               o3vmr, co2vmr,  & !ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, &
@@ -474,7 +476,41 @@
               nlayers, pavel, pz, tavel, tz, tbound, semiss, coldry, &
               wkl, wbrodl, wx, pwvcm, inflag, iceflag, liqflag, &
               cldfrac, tauc, ciwp, clwp, rei, rel, taua)
-
+          
+          call stuff_write_array('coldry', data1d = coldry)
+          call stuff_write_array('cldfrac', data1d = cldfrac)
+          call stuff_write_array('ciwp', data1d = ciwp)
+          call stuff_write_array('cldfr', data1d = cldfr(KST,:))
+          call stuff_write_array('taucloud', data1d = taucloud(:,2))
+          call stuff_write_array('taucloud5', data1d = taucloud(:,5))
+          call stuff_write_array('taucloud10', data1d = taucloud(:,10))
+          call stuff_write_array('tauc', data1d = tauc(2,:))
+          call stuff_write_array('tauc5', data1d = tauc(5,:))
+          call stuff_write_array('tauc10', data1d = tauc(10,:))
+          call stuff_write_array('taua', data1d = taua(:,2))
+          call stuff_write_array('taua5', data1d = taua(:,5))
+          call stuff_write_array('taua10', data1d = taua(:,10))
+          call stuff_write_array('ciwp', data1d = ciwp(:))
+          call stuff_write_array('clwp', data1d = clwp(:))
+          call stuff_write_array('rei', data1d = rei(:))
+          call stuff_write_array('rel', data1d = rel(:))
+          print *,inflag, iceflag, liqflag
+          print *,icld, iaer,pwvcm
+          print *,tbound
+          call stuff_write_array('semiss', data1d = semiss(:))
+          call stuff_write_array('wkl1', data1d = wkl(1,:))
+          call stuff_write_array('wkl2', data1d = wkl(2,:))
+          call stuff_write_array('wkl3', data1d = wkl(3,:))
+          call stuff_write_array('wkl4', data1d = wkl(4,:))
+          call stuff_write_array('wkl6', data1d = wkl(6,:))
+          call stuff_write_array('wkl7', data1d = wkl(7,:))
+          call stuff_write_array('wx1', data1d = wx(1,:))
+          call stuff_write_array('wx2', data1d = wx(2,:))
+          call stuff_write_array('wx3', data1d = wx(3,:))
+          call stuff_write_array('wx4', data1d = wx(4,:))
+          call stuff_write_array('wbrodl', data1d = wbrodl(:))
+          call stuff_write_array('tavel', data1d = tavel(:))
+          
 !  For cloudy atmosphere, use cldprop to set cloud optical properties based on
 !  input cloud physical properties.  Select method based on choices described
 !  in cldprop.  Cloud fraction, water path, liquid droplet and ice particle
@@ -783,7 +819,7 @@
 !  Note: In RRTMG, layer indexing goes from bottom to top, and coding below
 !  assumes GCM input fields are also bottom to top. Input layer indexing
 !  from GCM fields should be reversed here if necessary.
-
+      
       pz(0) = plev(iplon,nlay+1)/100.
       tz(0) = tlev(iplon,nlay+1)
       do l = 1, nlayers
@@ -813,7 +849,6 @@
          wx(2,l) = rcfc11*amdc1*coldry(l)*1.E-20_8!cfc11vmr(iplon,l)
          wx(3,l) = rcfc12*amdc2*coldry(l)*1.E-20_8!cfc12vmr(iplon,l)
          wx(4,l) = 0.!*amd/amc22!cfc22vmr(iplon,l)
-
       enddo      
 
 ! The following section can be used to set values for an additional layer (from

@@ -6,45 +6,77 @@
         USE rrtmg_lw_init
         Implicit None
         Integer(Kind=4), Parameter :: KST  = 2
-        Integer(Kind=4), Parameter :: KEND = 401
+        Integer(Kind=4), Parameter :: KEND = 2
         Integer(Kind=4), Parameter :: KLEV = 96
         Integer(Kind=4), Parameter :: KLON = 403
         !
         Integer(Kind=4)            :: ICLD = 2
         !
-        Real(Kind=8) PAPRSF_play   (KLEV)
-        Real(Kind=8) PAPRS_plev    (KLEV+1)
-        Real(Kind=8) PT_tlay       (KLEV)
-        Real(Kind=8) ZTH_tlev      (KLEV+1)
-        Real(Kind=8) PTS_tsfc      (1)
-        Real(Kind=8) ZQ_h2ovmr     (KLEV)
-        Real(Kind=8) PQO3_o3vmr   (KLEV)
-        Real(Kind=8) PEMIS_emis    (1)
-        Real(Kind=8) ZEMIW_emiw    (1)
-        Real(Kind=8) ZCLDSW_cldfr  (KLEV)
-        Real(Kind=8) ZTAUCLD_taucld(KLEV,16)
-        Real(Kind=8) ZFIWP_cicewp  (KLEV)
-        Real(Kind=8) ZFLWP_cliqwp  (KLEV)
-        Real(Kind=8) ZRADIP_reice  (KLEV)
-        Real(Kind=8) ZRADLP_reliq  (KLEV)
-        Real(Kind=8) Ztauaer_tauaer(5,KLEV)
+        Real(Kind=8) PAPRSF_play   (KST:KEND,KLEV)
+        Real(Kind=8) PAPRS_plev    (KST:KEND,KLEV+1)
+        Real(Kind=8) PT_tlay       (KST:KEND,KLEV)
+        Real(Kind=8) ZTH_tlev      (KST:KEND,KLEV+1)
+        Real(Kind=8) PTS_tsfc      (KST:KEND)
+        Real(Kind=8) ZQ_h2ovmr     (KST:KEND,KLEV)
+        Real(Kind=8) PQO3_o3vmr    (KST:KEND,KLEV)
+        Real(Kind=8) emis          (KST:KEND,nbndlw)
+        Real(Kind=8) PEMIS_emis    (KST:KEND)
+        Real(Kind=8) ZEMIW_emiw    (KST:KEND)
+        Real(Kind=8) ZCLDSW_cldfr  (KST:KEND,KLEV)
+        Real(Kind=8) ZTAUCLD_taucld(KST:KEND,KLEV,16)
+        Real(Kind=8) taucld        (16,KST:KEND,KLEV)
+        Real(Kind=8) ZFIWP_cicewp  (KST:KEND,KLEV)
+        Real(Kind=8) ZFLWP_cliqwp  (KST:KEND,KLEV)
+        Real(Kind=8) ZRADIP_reice  (KST:KEND,KLEV)
+        Real(Kind=8) ZRADLP_reliq  (KST:KEND,KLEV)
+        Real(Kind=8) Ztauaer_tauaer(KST:KEND,5,KLEV)
+        Real(Kind=8) tauaer        (KST:KEND,KLEV,16)
+        
+        Real(Kind=8) play  (KST:KEND,KLEV)
+        Real(Kind=8) plev  (KST:KEND,KLEV+1)
+        Real(Kind=8) tlay  (KST:KEND,KLEV)
+        Real(Kind=8) tlev  (KST:KEND,KLEV+1)
+        
+        Real(Kind=8) h2ovmr(KST:KEND,KLEV)
+        Real(Kind=8) co2vmr(KST:KEND,KLEV)
+        Real(Kind=8) o3vmr (KST:KEND,KLEV)
+        Real(Kind=8) n2ovmr(KST:KEND,KLEV)
+        Real(Kind=8) ch4vmr(KST:KEND,KLEV)
+        Real(Kind=8) o2vmr (KST:KEND,KLEV)
+        
+        Real(Kind=8) cfc11vmr(KST:KEND,KLEV)
+        Real(Kind=8) cfc12vmr(KST:KEND,KLEV)
+        Real(Kind=8) cfc22vmr(KST:KEND,KLEV)
+        Real(Kind=8) ccl4vmr (KST:KEND,KLEV)
         !
-        Real(Kind=8) UFLX          (KLEV+1)
-        Real(Kind=8) DFLX          (KLEV+1)
-        Real(Kind=4) UFLXC         (KLEV+1)
-        Real(Kind=4) DFLXC         (KLEV+1)
+        Real(Kind=8) UFLX          (KST:KEND,KLEV+1)
+        Real(Kind=8) DFLX          (KST:KEND,KLEV+1)
+        Real(Kind=8) UFLXC         (KST:KEND,KLEV+1)
+        Real(Kind=8) DFLXC         (KST:KEND,KLEV+1)
+        Real(Kind=8) hr            (KST:KEND,KLEV+1)
+        Real(Kind=8) hrc           (KST:KEND,KLEV+1)
         !
-        Real(Kind=8) UFLX_ref      (KLEV+1)
-        Real(Kind=8) DFLX_ref      (KLEV+1)
-        Real(Kind=4) UFLXC_ref     (KLEV+1)
-        Real(Kind=4) DFLXC_ref     (KLEV+1)
+        Real(Kind=8) UFLX_ref      (KST:KEND,KLEV+1)
+        Real(Kind=8) DFLX_ref      (KST:KEND,KLEV+1)
+        Real(Kind=4) UFLXC_ref     (KST:KEND,KLEV+1)
+        Real(Kind=4) DFLXC_ref     (KST:KEND,KLEV+1)
         !
-        Integer(Kind=4) NZK,NZKJ, fnid, KSTEP, i,i2, lon,k,k2
+        Integer(Kind=4) NZK,NZKJ, fnid, KSTEP, i,i2, lon,k,k2, n, nlay, l
         Character(100) fn
         Character(3) c3
         Character(100) prefix
         
         Real(Kind=8) R,RMD,RMV,RMO3,RD,RV,RCPD,RNAVO,RKBOL
+        
+        real(kind=8), parameter :: amdw = 1.607793_rb  ! Molecular weight of dry air / water vapor
+        real(kind=8), parameter :: amdc = 0.658114_rb  ! Molecular weight of dry air / carbon dioxide
+        real(kind=8), parameter :: amdo = 0.603428_rb  ! Molecular weight of dry air / ozone
+        real(kind=8), parameter :: amdm = 1.805423_rb  ! Molecular weight of dry air / methane
+        real(kind=8), parameter :: amdn = 0.658090_rb  ! Molecular weight of dry air / nitrous oxide
+        real(kind=8), parameter :: amdo2 = 0.905140_rb ! Molecular weight of dry air / oxygen
+        real(kind=8), parameter :: amdc1 = 0.210852_rb ! Molecular weight of dry air / CFC11
+        real(kind=8), parameter :: amdc2 = 0.239546_rb ! Molecular weight of dry air / CFC12
+        
         
         fnid = 60
         
@@ -68,55 +100,129 @@
         
         c3 = '050'
         
+        nlay = KLEV
+        
         do lon = KST, KEND
           !call IntToChar(lon, c3)
           
-          call read_rrtmg_array( data2d = PAPRSF_play (:)  , vn = 'PAPRSF' ,vnr = 'play', suffix = 'to')
-          call read_rrtmg_array( data2d = PAPRS_plev  (:)  , vn = 'PAPRS'  ,vnr = 'plev', suffix = 'to')
-          call read_rrtmg_array( data2d = PT_tlay     (:)  , vn = 'PT'     ,vnr = 'tlay', suffix = 'to')
-          call read_rrtmg_array( data2d = ZTH_tlev    (:)  , vn = 'ZTH'    ,vnr = 'tlev', suffix = 'to')
-          call read_rrtmg_array( data1d = PTS_tsfc         , vn = 'PTS'    ,vnr = 'tsfc', suffix = 'to')
-          call read_rrtmg_array( data2d = ZQ_h2ovmr     (:)  , vn = 'ZQ'     ,vnr = 'h2ovmr', suffix = 'to')
-          call read_rrtmg_array( data2d = PQO3_o3vmr   (:)  , vn = 'PQO3'   ,vnr = 'o3vmr', suffix = 'to')
-          call read_rrtmg_array( data1d = PEMIS_emis       , vn = 'PEMIS'  ,vnr = 'emis', suffix = 'to')
-          call read_rrtmg_array( data1d = ZEMIW_emiw       , vn = 'ZEMIW'  ,vnr = 'emiw', suffix = 'to')
-          call read_rrtmg_array( data2d = ZCLDSW_cldfr (:)  , vn = 'ZCLDSW' ,vnr = 'cldfr', suffix = 'to')
-          call read_rrtmg_array( data3d = ZTAUCLD_taucld(:,:), vn = 'ZTAUCLD',vnr = 'taucld', suffix = 'to')
-          call read_rrtmg_array( data2d = ZFIWP_cicewp  (:)  , vn = 'ZFIWP'  ,vnr = 'cicewp', suffix = 'to')
-          call read_rrtmg_array( data2d = ZFLWP_cliqwp  (:)  , vn = 'ZFLWP'  ,vnr = 'cliqwp', suffix = 'to')
-          call read_rrtmg_array( data2d = ZRADIP_reice (:)  , vn = 'ZRADIP' ,vnr = 'reice', suffix = 'to')
-          call read_rrtmg_array( data2d = ZRADLP_reliq (:)  , vn = 'ZRADLP' ,vnr = 'reliq', suffix = 'to')
-          call read_rrtmg_array( data3d = Ztauaer_tauaer(:,:), vn = 'Ztauaer',vnr = 'tauaer', suffix = 'to')
+          call read_rrtmg_array( data2d = PAPRSF_play (lon,:)  , vn = 'PAPRSF' ,vnr = 'play', suffix = 'to')
+          call read_rrtmg_array( data2d = PAPRS_plev  (lon,:)  , vn = 'PAPRS'  ,vnr = 'plev', suffix = 'to')
+          call read_rrtmg_array( data2d = PT_tlay     (lon,:)  , vn = 'PT'     ,vnr = 'tlay', suffix = 'to')
+          call read_rrtmg_array( data2d = ZTH_tlev    (lon,:)  , vn = 'ZTH'    ,vnr = 'tlev', suffix = 'to')
+          call read_rrtmg_array( data1d = PTS_tsfc    (:)    , vn = 'PTS'    ,vnr = 'tsfc', suffix = 'to')
+          call read_rrtmg_array( data2d = ZQ_h2ovmr   (lon,:)  , vn = 'ZQ'     ,vnr = 'h2ovmr', suffix = 'to')
+          call read_rrtmg_array( data2d = PQO3_o3vmr  (lon,:)  , vn = 'PQO3'   ,vnr = 'o3vmr', suffix = 'to')
+          call read_rrtmg_array( data1d = PEMIS_emis  (:)    , vn = 'PEMIS'  ,vnr = 'emis', suffix = 'to')
+          call read_rrtmg_array( data1d = ZEMIW_emiw  (:)    , vn = 'ZEMIW'  ,vnr = 'emiw', suffix = 'to')
+          call read_rrtmg_array( data2d = ZCLDSW_cldfr(lon,:)  , vn = 'ZCLDSW' ,vnr = 'cldfr', suffix = 'to')
+          call read_rrtmg_array( data3d = ZTAUCLD_taucld(lon,:,:), vn = 'ZTAUCLD',vnr = 'taucld', suffix = 'to')
+          call read_rrtmg_array( data2d = ZFIWP_cicewp  (lon,:)  , vn = 'ZFIWP'  ,vnr = 'cicewp', suffix = 'to')
+          call read_rrtmg_array( data2d = ZFLWP_cliqwp  (lon,:)  , vn = 'ZFLWP'  ,vnr = 'cliqwp', suffix = 'to')
+          call read_rrtmg_array( data2d = ZRADIP_reice (lon,:)  , vn = 'ZRADIP' ,vnr = 'reice', suffix = 'to')
+          call read_rrtmg_array( data2d = ZRADLP_reliq (lon,:)  , vn = 'ZRADLP' ,vnr = 'reliq', suffix = 'to')
+          call read_rrtmg_array( data3d = Ztauaer_tauaer(lon,:,:), vn = 'Ztauaer',vnr = 'tauaer', suffix = 'to')
         
           !-----------------------------
           
+          !USE YOMPHY3, ONLY :  RCH4     ,RN2O    ,RCFC11  ,RCFC12,RO2, RLWUH
+          co2vmr(lon,:) = RCARDI*amdc         ! 2
+          n2ovmr(lon,:) = RN2O*amdn           ! 4
+          ch4vmr(lon,:) = RCH4*amdm           ! 6
+          o2vmr (lon,:) = RO2*amdo2           ! 7
+          
+          cfc11vmr(lon,:) = rcfc11*amdc1
+          cfc12vmr(lon,:) = rcfc12*amdc2
+          cfc22vmr(lon,:) = 0._8
+          ccl4vmr (lon,:) = 0._8
+          
+          do l = 1,KLEV
+            h2ovmr(lon,l) = ZQ_h2ovmr (lon,nlay-l+1)*amdw  ! 1
+            o3vmr (lon,l) = PQO3_o3vmr(lon,nlay-l+1)*amdo  ! 3
+          end do
+          
+          do n=1,nbndlw
+            if (n < 6 .or. n > 8) then
+              emis(lon,n) = PEMIS_emis(lon)
+            else
+              emis(lon,n) = ZEMIW_emiw(lon)
+            endif
+          enddo
+          
+          do l = 1,KLEV
+            taucld(1:16, lon, l) = ZTAUCLD_taucld(lon, l, 1:16)
+          end do
+          
+          do l = 1,KLEV
+            play(lon, l) = PAPRSF_play(lon, nlay-l+1)/100._8
+            tlay(lon, l) = PT_tlay    (lon, nlay-l+1)
+          end do
+          
+          do l = 1,KLEV+1
+            plev(lon, l) = PAPRS_plev (lon, nlay+1-l+1)/100._8
+            tlev(lon, l) = ZTH_tlev   (lon, nlay+1-l+1)
+          end do
+          
+          do l = 1,KLEV
+            tauaer(lon, l, 1) = Ztauaer_tauaer(lon,1,nlay+1-l)
+            tauaer(lon, l, 2) = Ztauaer_tauaer(lon,1,nlay+1-l)
+            tauaer(lon, l, 3) = Ztauaer_tauaer(lon,2,nlay+1-l)                        
+            tauaer(lon, l, 4) = Ztauaer_tauaer(lon,2,nlay+1-l)
+            tauaer(lon, l, 5) = Ztauaer_tauaer(lon,2,nlay+1-l)
+            tauaer(lon, l, 6) = Ztauaer_tauaer(lon,3,nlay+1-l)
+            tauaer(lon, l, 8) = Ztauaer_tauaer(lon,3,nlay+1-l)
+            tauaer(lon, l, 9) = Ztauaer_tauaer(lon,3,nlay+1-l)  
+            tauaer(lon, l, 7) = Ztauaer_tauaer(lon,4,nlay+1-l)
+            tauaer(lon, l,10) = Ztauaer_tauaer(lon,5,nlay+1-l)
+            tauaer(lon, l,11) = Ztauaer_tauaer(lon,5,nlay+1-l)
+            tauaer(lon, l,12) = Ztauaer_tauaer(lon,5,nlay+1-l)
+            tauaer(lon, l,13) = Ztauaer_tauaer(lon,5,nlay+1-l)
+            tauaer(lon, l,14) = Ztauaer_tauaer(lon,5,nlay+1-l)                 
+            tauaer(lon, l,15) = Ztauaer_tauaer(lon,5,nlay+1-l)
+            tauaer(lon, l,16) = Ztauaer_tauaer(lon,5,nlay+1-l)
+          end do
+          
+          !ZCLDSW_cldfr(lon,1) = 0._8
+          
           CALL rrtmg_lw &
-              (lon,lon,1,KLEV, ICLD    ,0    , &
-              PAPRSF_play    , PAPRS_plev    ,PT_tlay    , ZTH_tlev    ,PTS_tsfc    , &
-              ZQ_h2ovmr  ,PQO3_o3vmr   , RCARDI,& !co2vmr  ,  ch4vmr  ,n2ovmr  ,o2vmr, &
-  !             cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr ,emis    , &
-  !             PEMIS,Zemiw, 0 ,2,1, ZCLDSW   , &
-  !             PEMIS,Zemiw, 2 ,3,1, ZCLDSW   , &
-              PEMIS_emis,ZEMIW_emiw, 2 ,2,1, ZCLDSW_cldfr   , &
-              ZTAUCLD_taucld  ,ZFIWP_cicewp  ,ZFLWP_cliqwp  , ZRADIP_reice   ,ZRADLP_reliq   , &
-              tauaer = Ztauaer_tauaer, &
-              uflx = uflx, dflx = dflx, uflxc = uflxc, dflxc = dflxc)
+              (ncol = 1, nlay = KLEV, icld = ICLD, idrv = 0, &
+              play = play, plev = plev, tlay = tlay, tlev = tlev, tsfc = PTS_tsfc, &
+              h2ovmr = h2ovmr, o3vmr = o3vmr, co2vmr = co2vmr, ch4vmr = ch4vmr, n2ovmr = n2ovmr, o2vmr = o2vmr, &
+              cfc11vmr = cfc11vmr, cfc12vmr = cfc12vmr, cfc22vmr = cfc22vmr, ccl4vmr = ccl4vmr, &
+              emis = emis, &
+              inflglw = 2, iceflglw = 2, liqflglw = 1, cldfr = ZCLDSW_cldfr, &
+              taucld = taucld, cicewp = ZFIWP_cicewp, cliqwp = ZFLWP_cliqwp, &
+              reice = ZRADIP_reice, reliq = ZRADLP_reliq   , &
+              tauaer = tauaer, &
+              uflx = uflx, dflx = dflx, hr = hr, uflxc = uflxc, dflxc = dflxc, hrc = hrc)
+              
+!             (ncol    ,nlay    ,icld    ,idrv    , &
+!              play    ,plev    ,tlay    ,tlev    ,tsfc    , &
+!              h2ovmr  ,o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr  ,o2vmr, &
+!              cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr ,emis    , &
+!              inflglw ,iceflglw,liqflglw,cldfr   , &
+!              taucld  ,cicewp  ,cliqwp  ,reice   ,reliq   , &
+!              tauaer  , &
+!              uflx    ,dflx    ,hr      ,uflxc   ,dflxc,  hrc, &
+!              duflx_dt,duflxc_dt )
+          
           
           !-----------------------------
           
-          call read_rrtmg_array( data2d  = UFLX_ref (:), vn = 'UFLX' ,vnr = 'uflx' , suffix = 'output')
-          call read_rrtmg_array( data2d  = DFLX_ref (:), vn = 'DFLX' ,vnr = 'dflx' , suffix = 'output')
-          call read_rrtmg_array( data2d4 = UFLXC_ref(:), vn = 'UFLXC',vnr = 'uflxc', suffix = 'output')
-          call read_rrtmg_array( data2d4 = DFLXC_ref(:), vn = 'DFLXC',vnr = 'dflxc', suffix = 'output')
+          call read_rrtmg_array( data2d  = UFLX_ref (lon,:), vn = 'UFLX' ,vnr = 'uflx' , suffix = 'output')
+          call read_rrtmg_array( data2d  = DFLX_ref (lon,:), vn = 'DFLX' ,vnr = 'dflx' , suffix = 'output')
+          call read_rrtmg_array( data2d4 = UFLXC_ref(lon,:), vn = 'UFLXC',vnr = 'uflxc', suffix = 'output')
+          call read_rrtmg_array( data2d4 = DFLXC_ref(lon,:), vn = 'DFLXC',vnr = 'dflxc', suffix = 'output')
           
           
-          if (.False.) then
+          if (.True.) then
             do k = 1,KLEV+1
-              write(*,'(i8,100(e20.12))') k,\
-                  UFLX (k),UFLX (k)-UFLX_ref (k), \
-                  DFLX (k),DFLX (k)-DFLX_ref (k), \
-                  UFLXC(k),UFLXC(k)-UFLXC_ref(k), \
-                  DFLXC(k),DFLXC(k)-DFLXC_ref(k)
+              write(*,'(i8,4(e15.5),a,4(e15.5),a,100(e15.5))') k,\
+                  UFLX (lon,k),UFLX_ref (lon,k),UFLX (lon,k)-UFLX_ref (lon,k),(UFLX (lon,k)-UFLX_ref (lon,k))/max(1.E-10,UFLX_ref (lon,k)), \
+                  ' - ',\
+                  DFLX (lon,k),DFLX_ref (lon,k),DFLX (lon,k)-DFLX_ref (lon,k),(DFLX (lon,k)-DFLX_ref (lon,k))/max(1.E-10,DFLX_ref (lon,k)), \
+                  ' - ',\
+                  UFLXC(lon,k),UFLXC(lon,k)-UFLXC_ref(lon,k), \
+                  DFLXC(lon,k),DFLXC(lon,k)-DFLXC_ref(lon,k)
             end do
           end if
           write(*,'(a,1(i6),10(e20.12))') c3,lon, maxval(abs(UFLX -UFLX_ref )), \
